@@ -10,7 +10,10 @@ library(tidyverse)
 library(readr)
 library(readxl)
 
-x <-read_xlsx('rain_sites.xlsx', col_types = 'text' )
+site_path <- "//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/rain_sites.xlsx"
+output_path <- "//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/rainfall_data.csv"
+
+x <-read_xlsx(site_path, col_types = 'text' )
 
 ##creates the build string funciton
 source('build_api_string_func.R')
@@ -48,15 +51,20 @@ Yest_data$date <- Yest_data$date %>%
 ## Pulls in current CSV file and compares old data to new data
 ## This step throws out any repeat time-site combos
 ## script will replaces with the new data if there is a conflict.
-Old_data <- read_csv('rainfall_data.csv')
-Old_data <- anti_join(Old_data, Yest_data, by = c("date", "site"))
+if(!file.exists(output_path)) {
+    write_csv(Yest_data,output_path)
+} else {
+    Old_data <- read_csv(output_path)
+    Old_data <- anti_join(Old_data, Yest_data, by = c("date", "site"))
+    
+    ##bind API pull from Yesterday into old data table
+    New_data <- rbind(Old_data,Yest_data)
+    
+    ## writes new csv file including yesterday's data.
+    write_csv(New_data,output_path)
+    rm(Old_data, New_data)
+} 
 
-##bind API pull from Yesterday into old data table
-New_data <- rbind(Old_data,Yest_data)
+rm(res,x,Yest_data_site,Yest_data, build_APIstring)
 
-## writes new csv file including yesterday's data.
-write_csv(New_data,"rainfall_data.csv")
-
-rm(res,x,Yest_data_site,Old_data,Yest_data, build_APIstring)
-rm(New_data)
 
