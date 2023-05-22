@@ -63,7 +63,6 @@ if(!file.exists(output_path)) {
     
     ## writes new csv file including yesterday's data.
     write_csv(New_data,output_path)
-
     rm(Old_data, New_data)
 } 
 
