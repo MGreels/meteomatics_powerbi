@@ -10,8 +10,9 @@ library(tidyverse)
 library(readr)
 library(readxl)
 
-site_path <- "//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/rain_sites.xlsx"
-output_path <- "//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/rainfall_data.csv"
+site_path <- 'rain_sites.xlsx'
+output_path <- 'rainfall_data.csv'
+setwd('//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/')##sets wd for task scheduler
 
 x <-read_xlsx(site_path, col_types = 'text' )
 
