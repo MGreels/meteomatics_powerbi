@@ -8,6 +8,9 @@ api3 <-    '/json'
 
 paste(api1,lat,api2, lon, api3, sep = '')
         
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a81800524ccb07fce9d04429264c21d31e8f423
 }
 
