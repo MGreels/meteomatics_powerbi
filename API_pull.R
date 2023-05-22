@@ -1,3 +1,8 @@
+#############
+#   Pulls API data for single points contained in 'rain_sites.xlsx
+#   
+
+
 library(jsonlite)
 library(httr)
 library(dplyr)
@@ -26,14 +31,19 @@ Yest_data <-
     } else {Yest_data_site}
     
 }
+rm(i)
+##pulls old data from n
+Yest_data$date <- Yest_data$date %>%
+    as.POSIXct(format="%Y-%m-%dT%H:%M:%OSZ", tz = 'UTC') %>%
+    format(tz = 'EST') %>%
+    as.POSIXct()
 
-
-
-####COMBINES OLD AND NEW BUT DOES NOT REMOVE DUPLICATES!!!
 Old_data <- read_csv('rainfall_data.csv')
-#Old_data <- group_by(Old_data, site)
-#Yest_data <- group_by(Yest_data, site)
+Old_data <- anti_join(Old_data, Yest_data, by = c("date", "site"))##removes old data
+
+##bind API pull from Yesterday into old data table
 New_data <- rbind(Old_data,Yest_data)
+write_csv(New_data,"rainfall_data.csv")
 
+rm(res,x,Yest_data_site,Old_data,Yest_data)
 
-rm(res,x,Yest_data_site)
