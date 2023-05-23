@@ -10,9 +10,11 @@ library(tidyverse)
 library(readr)
 library(readxl)
 
+Sys.setenv(TZ='est') ##trimble doesn't recognize Daylight Savings time, so set to standard time
 site_path <- 'rain_sites.xlsx'
 output_path <- 'rainfall_data.csv'
 setwd('//chelsea3/Users/Greeley_M/projects/meteomatics_powerbi/')##sets wd for task scheduler
+
 
 x <-read_xlsx(site_path, col_types = 'text' )
 
@@ -27,19 +29,19 @@ if(exists('Yest_data')){
 ## creates an API link and pull the data from the meteopmatics API.
 ## Pulls hourly rainfall totals from each site from yesterday.
 for (i in 1:nrow(x)) {
-res <- GET(build_APIstring(x$Lat[i], x$Lon[i]),
-        authenticate('mwra_greeley','kk4U3R3cJm'))
-res <- fromJSON(rawToChar(res$content))
-
-
-Yest_data_site <- res$data$coordinates[[1]][[3]][[1]] %>%
-    mutate(lat = res$data$coordinates[[1]][[1]],
-           lon = res$data$coordinates[[1]][[2]],
-           site = x$Site[i])
-Yest_data <- 
-    if(exists('Yest_data')){
-    rbind(Yest_data, Yest_data_site)
-    } else {Yest_data_site}
+    res <- GET(build_APIstring(x$Lat[i], x$Lon[i]),
+               authenticate('mwra_greeley','kk4U3R3cJm'))
+    res <- fromJSON(rawToChar(res$content))
+    
+    
+    Yest_data_site <- res$data$coordinates[[1]][[3]][[1]] %>%
+        mutate(lat = res$data$coordinates[[1]][[1]],
+               lon = res$data$coordinates[[1]][[2]],
+               site = x$Site[i])
+    Yest_data <- 
+        if(exists('Yest_data')){
+            rbind(Yest_data, Yest_data_site)
+        } else {Yest_data_site}
     
 }
 rm(i)
@@ -66,6 +68,4 @@ if(!file.exists(output_path)) {
     rm(Old_data, New_data)
 } 
 
-rm(res,x,Yest_data_site,Yest_data, build_APIstring)
-
-
+rm(res,x,Yest_data_site,Yest_data, build_APIstring, output_path, site_path)
